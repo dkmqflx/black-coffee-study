@@ -83,7 +83,12 @@ function App() {
       .map((menuItem, index) => {
         return `
       <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-        <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
+        <span class="${
+          menuItem.soldOut ? "sold-out" : ""
+        } w-100 pl-2 menu-name">${menuItem.name}</span>
+        <button type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-sold-out-button">
+        품절
+        </button>
         <button type="button" class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button">
         수정
         </button>
@@ -144,15 +149,30 @@ function App() {
     }
   };
 
+  const soldOutMenu = (e) => {
+    const menuId = e.target.closest("li").dataset.menuId;
+    this.menu[this.currentCategory][menuId].soldOut =
+      !this.menu[this.currentCategory][menuId].soldOut;
+    store.setLocalStorage(this.menu);
+    render();
+  };
+
   // 아직 수정 버튼이 없기 때문에 li 태그에 이벤트 위임한다
   $("#menu-list").addEventListener("click", (e) => {
     if (e.target.classList.contains("menu-edit-button")) {
       // element의 텍스트의 값으로 비교하기 보다는 가능하면 element가 가진 속성들을 이용하는 것이 좋다
       updateMenuName(e);
+      return;
+      // 아래 if문 실행할 필기 때문에 return 문을 실행해준다.
     }
 
     if (e.target.classList.contains("menu-remove-button")) {
       removeMenuName(e);
+      return;
+    }
+    if (e.target.classList.contains("menu-sold-out-button")) {
+      soldOutMenu(e);
+      return;
     }
   });
 
