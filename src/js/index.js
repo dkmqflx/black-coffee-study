@@ -46,17 +46,8 @@ TODO 페이지 접근시 최초 데이터 Read & Rendering
 
 */
 
-const $ = (selector) => document.querySelector(selector);
-// $ 표시, DOM 가져올 때 관용적으로 많이 사용한다
-
-const store = {
-  setLocalStorage(menu) {
-    localStorage.setItem("menu", JSON.stringify(menu));
-  },
-  getLocalStorage() {
-    return localStorage.getItem("menu");
-  },
-};
+import { $ } from "./utils/dom.js";
+import store from "./store/index.js";
 
 function App() {
   // 상태는 변할 수 있는 데이터 , 이 앱에서 변하는 것이 무엇인가 - 메뉴명
@@ -76,6 +67,7 @@ function App() {
       this.menu = JSON.parse(store.getLocalStorage());
     }
     render();
+    initEventListeners();
   };
 
   const render = () => {
@@ -106,7 +98,7 @@ function App() {
   };
 
   const updateMenuCount = () => {
-    const menuCount = $("#menu-list").querySelectorAll("li").length;
+    const menuCount = this.menu[this.currentCategory].length;
     $(".menu-count").innerText = `총 ${menuCount}개`;
   };
 
@@ -134,8 +126,7 @@ function App() {
     const updatedMenuName = prompt("메뉴명을 수정하세요.", $menuName.innerText);
     this.menu[this.currentCategory][menuId].name = updatedMenuName;
     store.setLocalStorage(this.menu);
-
-    $menuName.innerText = updatedMenuName;
+    render();
   };
 
   const removeMenuName = (e) => {
@@ -144,8 +135,7 @@ function App() {
       this.menu[this.currentCategory].splice(menuId, 1);
       store.setLocalStorage(this.menu);
 
-      e.target.closest("li").remove();
-      updateMenuCount();
+      render();
     }
   };
 
@@ -157,51 +147,61 @@ function App() {
     render();
   };
 
-  // 아직 수정 버튼이 없기 때문에 li 태그에 이벤트 위임한다
-  $("#menu-list").addEventListener("click", (e) => {
-    if (e.target.classList.contains("menu-edit-button")) {
-      // element의 텍스트의 값으로 비교하기 보다는 가능하면 element가 가진 속성들을 이용하는 것이 좋다
-      updateMenuName(e);
-      return;
-      // 아래 if문 실행할 필기 때문에 return 문을 실행해준다.
-    }
+  const initEventListeners = () => {
+    // 아직 수정 버튼이 없기 때문에 li 태그에 이벤트 위임한다
+    $("#menu-list").addEventListener("click", (e) => {
+      if (e.target.classList.contains("menu-edit-button")) {
+        // element의 텍스트의 값으로 비교하기 보다는 가능하면 element가 가진 속성들을 이용하는 것이 좋다
+        updateMenuName(e);
+        return;
+        // 아래 if문 실행할 필기 때문에 return 문을 실행해준다.
+      }
 
-    if (e.target.classList.contains("menu-remove-button")) {
-      removeMenuName(e);
-      return;
-    }
-    if (e.target.classList.contains("menu-sold-out-button")) {
-      soldOutMenu(e);
-      return;
-    }
-  });
+      if (e.target.classList.contains("menu-remove-button")) {
+        removeMenuName(e);
+        return;
+      }
+      if (e.target.classList.contains("menu-sold-out-button")) {
+        soldOutMenu(e);
+        return;
+      }
+    });
 
-  $("#menu-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    // form 태그가 자동으로 전송되는 것을 막아준다.
-  });
+    $("#menu-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      // form 태그가 자동으로 전송되는 것을 막아준다.
+    });
 
-  $("#menu-submit-button").addEventListener("click", addMenuName);
+    $("#menu-submit-button").addEventListener("click", addMenuName);
 
-  $("#menu-name").addEventListener("keypress", (e) => {
-    if (e.key !== "Enter") {
-      return;
-    }
-    addMenuName();
-  });
+    $("#menu-name").addEventListener("keypress", (e) => {
+      if (e.key !== "Enter") {
+        return;
+      }
+      addMenuName();
+    });
 
-  $("nav").addEventListener("click", (e) => {
-    const isCategoryButton = e.target.classList.contains("cafe-category-name");
-    if (isCategoryButton) {
-      const categoryName = e.target.dataset.categoryName;
-      this.currentCategory = categoryName;
+    $("nav").addEventListener("click", (e) => {
+      const isCategoryButton =
+        e.target.classList.contains("cafe-category-name");
+      if (isCategoryButton) {
+        const categoryName = e.target.dataset.categoryName;
+        this.currentCategory = categoryName;
 
-      $("#category-title").innerText = `${e.target.innerText} 메뉴 관리`;
+        $("#category-title").innerText = `${e.target.innerText} 메뉴 관리`;
 
-      render();
-    }
-  });
+        render();
+      }
+    });
+  };
 }
 
 const app = new App();
 app.init();
+
+/**
+ * APP 함수는 '클래스'가 아니다
+ * new를 사용한 것은 this를 사용하기 위해서 생성자 함수로 취급하기 위함이다.
+ * 따라서 함수 안에 this 없이 함수를 호출할 수가 있다
+ * 다만, this.init으로 함수를 정의한 것은, 외부에서 해당 함수를 호출할 수 있도록 this를 붙여준 것이다
+ */
