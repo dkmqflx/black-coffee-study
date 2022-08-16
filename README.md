@@ -27,16 +27,6 @@
 블랙커피처럼 서로를 자극해주고, 동기부여 해주며, 그 성장과정으로 인해 의미있는 가치를 만들어내고자 하는  
 **개발자 커뮤니티** ☕️ **Black Coffee**입니다.
 
-<br/>
-
-## 오히려 좋아
-
-- 신성수
-- 유세빈
-- 추지애
-- 김도현
-- 최재원
-- 이경아
 
 <br/>
 
@@ -240,3 +230,8 @@ live-server 폴더명
 ## 📝 License
 
 This project is [MIT](https://github.com/blackcoffee-study/moonbucks-menu/blob/main/LICENSE) licensed.
+
+<br/>
+
+## Lecture
+[☕ 블랙커피 Vanilla JS Lv1. 문벅스 카페 메뉴 앱 만들기](https://www.udemy.com/course/vanilla-js-lv1/)
